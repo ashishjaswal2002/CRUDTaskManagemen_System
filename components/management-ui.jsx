@@ -3,19 +3,14 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 
 
-import {z} from 'zod';
-import { useForm } from "react-hook-form";
+
+
 export function ManagementUi() {
 
-const schema = z.object({
-  title:z.string().min(2),
-  description:z.string().min(5),
-  dueDate:z.string().min(2),
-})
 
 
   const [showModal, setShowModal] = useState(false);
