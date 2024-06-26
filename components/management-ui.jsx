@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 
+
+
 export function ManagementUi() {
   const [showModal, setShowModal] = useState(false);
   const [tasks, setTasks] = useState([]);
@@ -19,17 +21,22 @@ export function ManagementUi() {
   const [editDescription, setEditDescription] = useState('');
   const [editDueDate, setEditDueDate] = useState('');
 
+  const [errors, setErrors] = useState({}); //for the errors message
+  const [isFormValid, setIsFormValid] = useState(false); 
+
   useEffect(() => {
+    validateForm(); 
     if (typeof window !== 'undefined') {
       fetch('/api/tasks')
        .then(response => response.json())
        .then(data => setTasks(data));
     }
-  }, []);
+  },[title, description, dueDate]);
 
 
   const handleAddTask = async (e) => {
     e.preventDefault(); 
+
 
     try {
       let response;
@@ -97,7 +104,7 @@ export function ManagementUi() {
       setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
     } catch (error) {
       console.error('Error deleting task:', error);
-      // Handle error (e.g., show error message to user)
+
     }
   };
   // Function to handle editing a task
@@ -108,6 +115,26 @@ export function ManagementUi() {
     setEditDueDate(task.dueDate);
     setShowModal(true); // Open modal for editing
   };
+
+  const validateForm = () => { 
+    let errors = {}; 
+
+    if (!title) { 
+        errors.name = 'Name is required.'; 
+    } 
+
+    if (!description) { 
+       errors.description = "Description is required"
+    } 
+
+    if (!dueDate) { 
+       errors.dueDate = "Due date is required"
+    } 
+
+    setErrors(errors); 
+    setIsFormValid(Object.keys(errors).length === 0); 
+}; 
+
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -137,8 +164,11 @@ export function ManagementUi() {
               <p className="text-lg font-medium">{editTask ? 'Edit task' : 'Add a new task'}</p>
               <form className="grid w-full gap-4" onSubmit={handleAddTask}>
                 <Input placeholder="Task title" value={editTask ? editTitle : title} onChange={editTask ? (e) => setEditTitle(e.target.value) : (e) => setTitle(e.target.value)} />
-                <Textarea placeholder="Task description" value={editTask ? editDescription : description} onChange={editTask ? (e) => setEditDescription(e.target.value) : (e) => setDescription(e.target.value)} />
+                {errors.name && <p className="text-red-500">{errors.name}</p>}
+                <Input placeholder="Task description" value={editTask ? editDescription : description} onChange={editTask ? (e) => setEditDescription(e.target.value) : (e) => setDescription(e.target.value)} />
+                {errors.name && <p className="text-red-500">{errors.description}</p>}
                 <Input type="date" value={editTask ? editDueDate : dueDate} onChange={editTask ? (e) => setEditDueDate(e.target.value) : (e) => setDueDate(e.target.value)} />
+                {errors.name && <p className="text-red-500">{errors.dueDate}</p>}
                 <div className="flex justify-end gap-2">
                   <Button variant="ghost" onClick={() => setShowModal(false)}>
                     Cancel
